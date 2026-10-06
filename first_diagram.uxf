@@ -1,0 +1,35 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notesSimpleClass</help_text><element><id>UMLClass</id><coordinates><x>230</x><y>350</y><w>350</w><h>110</h></coordinates><panel_attributes>/Agent/
+--
+-position: Vector2
+-speed: float
+--
++move(dir: Vector2)
++getPerception(): Perception
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>540</y><w>180</w><h>90</h></coordinates><panel_attributes>ThiefAgent
+--
+-stolenItems: int
+--
++stealItem(item: Item)
++escape()
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>540</x><y>540</y><w>190</w><h>100</h></coordinates><panel_attributes>BeastAgent
+--
+-hearingRadius: float
+--
++catchThief(thief: ThiefAgent)
++updateBelief()
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>610</x><y>340</y><w>260</w><h>120</h></coordinates><panel_attributes>«NeuralNetwork»
+NoseEstimator
+--
+-memoryBuffer: Tensor
+--
++predictPosition(): ProbabilityMap
++estimateTrajectory(): Vector2
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>180</y><w>200</w><h>120</h></coordinates><panel_attributes>MazeEnvironment
+--
+-grid: int[ ][ ]
+-timeRemaining: float = 90.0
+--
++generateMaze()
++step()
++checkWinCondition(): bool
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>350</x><y>450</y><w>90</w><h>110</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>70;10;10;90</additional_attributes></element><element><id>Relation</id><coordinates><x>510</x><y>450</y><w>90</w><h>110</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;70;90</additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>290</y><w>30</w><h>80</h></coordinates><panel_attributes></panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>660</x><y>450</y><w>100</w><h>110</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>80;10;10;90</additional_attributes></element></diagram>

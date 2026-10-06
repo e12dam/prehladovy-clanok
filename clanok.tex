@@ -7,6 +7,7 @@
 \usepackage[IL2]{fontenc} % lepšia sadzba písmena Ľ než v T1
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{url} % príkaz \url na formátovanie URL
 \usepackage{hyperref} % odkazy v texte budú aktívne (pri niektorých triedach dokumentov spôsobuje posun textu)
 
@@ -59,6 +60,25 @@ Aj text môže byť prezentovaný ako obrázok . Stane sa z neho označný pláv
 \caption{Rozhodujúci argument.}
 \label{f:rozhod}
 \end{figure*}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{first_diagram.pdf}
+    \caption{Prvý diagram}
+    \label{fig:diag1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{second_diagram.pdf}
+    \caption{Druhý diagram}
+    \label{fig:diag2}
+  \end{subfigure}
+  \caption{Porovnanie dvoch diagramov}
+  \label{fig:dva_diagramy}
+\end{figure}
 
 
 
