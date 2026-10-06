@@ -1,144 +1,80 @@
 % Metódy inžinierskej práce
 
-\documentclass[10pt,twoside,slovak,a4paper]{article}
+\documentclass[10pt,twoside,slovak,a4paper,twocolumn]{article}
 
 \usepackage[slovak]{babel}
-%\usepackage[T1]{fontenc}
-\usepackage[IL2]{fontenc} % lepšia sadzba písmena Ľ než v T1
+\usepackage[IL2]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage{url} % príkaz \url na formátovanie URL
-\usepackage{hyperref} % odkazy v texte budú aktívne (pri niektorých triedach dokumentov spôsobuje posun textu)
-
+\usepackage{url}
+\usepackage{hyperref}
 \usepackage{cite}
-%\usepackage{times}
 
 \pagestyle{headings}
 
-\title{Názov\thanks{Semestrálny projekt v predmete Metódy inžinierskej práce, ak. rok 2015/16, vedenie: Meno Priezvisko}} % meno a priezvisko vyučujúceho na cvičeniach
+\title{Stealth Characters Enhanced by Neural Training (SCENT)\thanks{Semestrálny projekt v predmete Metódy inžinierskej práce}}
 
-\author{Meno Priezvisko\\[2pt]
+\author{Omny-1 \and e12dam\\[2pt]
 	{\small Slovenská technická univerzita v Bratislave}\\
 	{\small Fakulta informatiky a informačných technológií}\\
 	{\small \texttt{...@stuba.sk}}
 	}
 
-\date{\small 30. september 2015} % upravte
-
-
+\date{\today}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-\ldots
+Nepriateľské postavy v stealth hrách bývajú často riadené vopred definovanými pravidlami, vďaka čomu je ich správanie ľahko predvídateľné. Projekt SCENT sa zameriava na vytvorenie herných postáv s rozhodovaním založeným na neurónových sieťach, ktoré využívajú iba realisticky dostupné informácie. V 2D bludisku využíva nepriateľ odhadovací modul „nose“ na lokalizáciu hráča pomocou videných a počutých vnemov bez podvádzania v hernom stave.
 \end{abstract}
 
-
-
 \section{Úvod}
+V tradičných stealth hrách sa nepriatelia pohybujú po vopred stanovených trasách a po strate kontaktu s hráčom sa iba presunú na miesto jeho posledného výskytu. Snaha autorov o vytvorenie náročnejšieho protivníka často vedie k tomu, že mu priamo sprístupnia globálnu pozíciu hráča, čo pôsobí neférovo.
 
-Motivujte čitateľa a vysvetlite, o čom píšete. Úvod sa väčšinou nedelí na časti.
+Projekt SCENT overuje trénovanie dvoch protichodných agentov v náhodne generovanom 2D bludisku z pohľadu zhora: zlodeja (\textit{Thief}) a príšery (\textit{Beast}). Zlodej má za úlohu nájsť tri predmety a uniknúť východom v časovom limite 90 sekúnd, zatiaľ čo príšera sa ho snaží chytiť. Ani jedna postava na začiatku nepozná umiestnenie predmetov a nepriateľ nikdy nedostáva skutočnú pozíciu zlodeja.
 
-Uveďte explicitne štruktúru článku. Tu je nejaký príklad.
-Základný problém, ktorý bol naznačený v úvode, je podrobnejšie vysvetlený v časti~\ref{nejaka}.
-Dôležité súvislosti sú uvedené v častiach~\ref{dolezita} a~\ref{dolezitejsia}.
-Záverečné poznámky prináša časť~\ref{zaver}.
+Štruktúra článku je rozdelená nasledovne: v časti~\ref{architektura} predstavujeme architektúru systému a stavový diagram príšery, časť~\ref{metodologia} popisuje tréning pomocou napodobňovania a algoritmu PPO a časť~\ref{zaver} sumarizuje doterajšie výsledky a prínos projektu.
 
-
-
-\section{Nejaká časť} \label{nejaka}
-
-Z obr.~\ref{f:rozhod} je všetko jasné. 
-
-\begin{figure*}[tbh]
+\begin{figure*}[t]
 \centering
-%\includegraphics[scale=1.0]{diagram.pdf}
-Aj text môže byť prezentovaný ako obrázok . Stane sa z neho označný plávajúci objekt. Po vytvorení diagramu zrušte znak \texttt{\%} pred príkazom \verb|\includegraphics| označte tento riadok ako komentár (tiež pomocou znaku \texttt{\%}).
-\caption{Rozhodujúci argument.}
-\label{f:rozhod}
+\fbox{\parbox{0.95\textwidth}{\centering \textbf{SCENT System Overview:} Integrácia simulačného prostredia \textit{MazeEnvironment}, odhadovacieho modulu \textit{NoseEstimator} a politík agentov trénovaných pomocou algoritmu PPO.}}
+\caption{Prehľad celého herného systému cez obe kolóny.}
+\label{f:prehlad}
 \end{figure*}
 
-\begin{figure}[htbp]
+\section{Architektúra a správanie agentov} \label{architektura}
+Na hľadanie zlodeja využíva nepriateľ samostatnú neurónovú sieť nazývanú „nose“. Táto sieť analyzuje, čo nepriateľ videl, počul a zapamätal si, a na základe toho odhaduje pravdepodobnú polohu hráča.
+
+\begin{figure*}[htbp]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\linewidth]{first_diagram.pdf}
-    \caption{Prvý diagram}
+    \caption{Diagram tried systému}
     \label{fig:diag1}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\linewidth]{second_diagram.pdf}
-    \caption{Druhý diagram}
+    \caption{Stavový diagram príšery}
     \label{fig:diag2}
   \end{subfigure}
-  \caption{Porovnanie dvoch diagramov}
+  \caption{UML diagramy systému SCENT}
   \label{fig:dva_diagramy}
-\end{figure}
+\end{figure*}
 
+Na obrázku~\ref{fig:dva_diagramy} sú znázornené vzťahy medzi triedami prostredia a stavový automat rozhodovania príšery, ktorá dynamicky prepína medzi hliadkovaním (\textit{Patrolling}), prešetrovaním zvukov (\textit{Investigating}) a prenasledovaním (\textit{Chasing}).
 
+\section{Metodológia a trénovanie} \label{metodologia}
+Každú postavu ovláda vlastná neurónová sieť rozhodujúca o smere pohybu. Agenti sa najprv učia napodobňovaním správania heuristických botov (Behavioral Cloning). Následne prebieha optimalizácia prostredníctvom posilňovaného učenia (Reinforcement Learning) s algoritmom PPO v stovkách tisícov vzájomných hier, kde siete postupne zlepšujú svoje rozhodovanie na základe odmien a trestov.
 
-\section{Iná časť} \label{ina}
+\section{Vyhodnotenie a záver} \label{zaver}
+Prvý prototyp potvrdil významný prínos modulu „nose“: nepriateľ chytil zlodeja v 65\,\% hier s použitím odhadu pozície v porovnaní s iba 31\,\% úspešnosťou bez neho. Projekt sa zameriava aj na testovanie s reálnymi hráčmi s cieľom overiť prirodzenosť a férovosť pohybu nepriateľa. Výsledkom bude hrateľná hra v prehliadači a znovupoužiteľná metodika pre vývoj herných NPC.
 
-Základným problémom je teda\ldots{} Najprv sa pozrieme na nejaké vysvetlenie (časť~\ref{ina:nejake}), a potom na ešte nejaké (časť~\ref{ina:nejake}).\footnote{Niekedy môžete potrebovať aj poznámku pod čiarou.}
-
-Môže sa zdať, že problém vlastne nejestvuje\cite{Coplien:MPD}, ale bolo dokázané, že to tak nie je~\cite{Czarnecki:Staged, Czarnecki:Progress}. Napriek tomu, aj dnes na webe narazíme na všelijaké pochybné názory\cite{PLP-Framework}. Dôležité veci možno \emph{zdôrazniť kurzívou}.
-
-
-\subsection{Nejaké vysvetlenie} \label{ina:nejake}
-
-Niekedy treba uviesť zoznam:
-
-\begin{itemize}
-\item jedna vec
-\item druhá vec
-	\begin{itemize}
-	\item x
-	\item y
-	\end{itemize}
-\end{itemize}
-
-Ten istý zoznam, len číslovaný:
-
-\begin{enumerate}
-\item jedna vec
-\item druhá vec
-	\begin{enumerate}
-	\item x
-	\item y
-	\end{enumerate}
-\end{enumerate}
-
-
-\subsection{Ešte nejaké vysvetlenie} \label{ina:este}
-
-\paragraph{Veľmi dôležitá poznámka.}
-Niekedy je potrebné nadpisom označiť odsek. Text pokračuje hneď za nadpisom.
-
-
-
-\section{Dôležitá časť} \label{dolezita}
-
-
-
-
-\section{Ešte dôležitejšia časť} \label{dolezitejsia}
-
-
-
-
-\section{Záver} \label{zaver} % prípadne iný variant názvu
-
-
-
-%\acknowledgement{Ak niekomu chcete poďakovať\ldots}
-
-
-% týmto sa generuje zoznam literatúry z obsahu súboru literatura.bib podľa toho, na čo sa v článku odkazujete
 \bibliography{literatura}
-\bibliographystyle{plain} % prípadne alpha, abbrv alebo hociktorý iný
+\bibliographystyle{plain}
 \end{document}
