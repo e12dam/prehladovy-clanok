@@ -6,7 +6,10 @@
 \usepackage[IL2]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{wrapfig}
 \usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{cite}
@@ -32,6 +35,12 @@ Nepriateľské postavy v stealth hrách bývajú často riadené vopred definova
 \end{abstract}
 
 \section{Úvod}
+\begin{wrapfigure}{r}{0.22\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{fiit_nahlad.png}
+  \caption{Logo}
+  \label{fig:logo}
+\end{wrapfigure}
 V tradičných stealth hrách sa nepriatelia pohybujú po vopred stanovených trasách a po strate kontaktu s hráčom sa iba presunú na miesto jeho posledného výskytu. Snaha autorov o vytvorenie náročnejšieho protivníka často vedie k tomu, že mu priamo sprístupnia globálnu pozíciu hráča, čo pôsobí neférovo.
 
 Projekt SCENT overuje trénovanie dvoch protichodných agentov v náhodne generovanom 2D bludisku z pohľadu zhora: zlodeja (\textit{Thief}) a príšery (\textit{Beast}). Zlodej má za úlohu nájsť tri predmety a uniknúť východom v časovom limite 90 sekúnd, zatiaľ čo príšera sa ho snaží chytiť. Ani jedna postava na začiatku nepozná umiestnenie predmetov a nepriateľ nikdy nedostáva skutočnú pozíciu zlodeja.
@@ -70,7 +79,23 @@ Na hľadanie zlodeja využíva nepriateľ samostatnú neurónovú sieť nazývan
 Na obrázku~\ref{fig:dva_diagramy} sú znázornené vzťahy medzi triedami prostredia a stavový automat rozhodovania príšery, ktorá dynamicky prepína medzi hliadkovaním (\textit{Patrolling}), prešetrovaním zvukov (\textit{Investigating}) a prenasledovaním (\textit{Chasing}).
 
 \section{Metodológia a trénovanie} \label{metodologia}
-Každú postavu ovláda vlastná neurónová sieť rozhodujúca o smere pohybu. Agenti sa najprv učia napodobňovaním správania heuristických botov (Behavioral Cloning). Následne prebieha optimalizácia prostredníctvom posilňovaného učenia (Reinforcement Learning) s algoritmom PPO v stovkách tisícov vzájomných hier, kde siete postupne zlepšujú svoje rozhodovanie na základe odmien a trestov.
+Každú postavu ovláda vlastná neurónová sieť rozhodujúca o smere pohybu. Agenti sa najprv učia napodobňovaním správania heuristických botov pomocou behaviorálneho klonovania~\cite{Pomerleau1989ALVINN}. Následne prebieha optimalizácia prostredníctvom posilňovaného učenia (Reinforcement Learning)~\cite{Sutton1998} v simulačnom prostredí s rozhraním Gym~\cite{Gymnasium}. Tradičné stavové riešenia z komerčných stealth hier~\cite{Isla2005Halo} sú nahradené neurónovými sieťami.
+
+Pravdepodobnosti prechodu medzi diskrétnymi stavmi v bludisku definuje matica prechodov rozmerov $5 \times 4$:
+\begin{equation} \label{eq:matrix}
+P = \begin{pmatrix}
+p_{11} & p_{12} & p_{13} & p_{14} \\
+p_{21} & p_{22} & p_{23} & p_{24} \\
+p_{31} & p_{32} & p_{33} & p_{34} \\
+p_{41} & p_{42} & p_{43} & p_{44} \\
+p_{51} & p_{52} & p_{53} & p_{54}
+\end{pmatrix}
+\end{equation}
+
+Učenie prebieha pomocou algoritmu PPO~\cite{Schulman2017PPO} v stovkách tisícov vzájomných hier. Cieľová funkcia s orezaním je popísaná vzťahom~(\ref{eq:ppo}):
+\begin{equation} \label{eq:ppo}
+L^{CLIP}(\theta) = \hat{\mathbb{E}}_t \left[ \min \left( r_t(\theta) \hat{A}_t, \, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t \right) \right]
+\end{equation}
 
 \section{Vyhodnotenie a záver} \label{zaver}
 Prvý prototyp potvrdil významný prínos modulu „nose“: nepriateľ chytil zlodeja v 65\,\% hier s použitím odhadu pozície v porovnaní s iba 31\,\% úspešnosťou bez neho. Projekt sa zameriava aj na testovanie s reálnymi hráčmi s cieľom overiť prirodzenosť a férovosť pohybu nepriateľa. Výsledkom bude hrateľná hra v prehliadači a znovupoužiteľná metodika pre vývoj herných NPC.
